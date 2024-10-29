@@ -7,6 +7,13 @@ public abstract class Account {
 	private String password;
 	private Role role;
 	
+	public Account(String name, String email, String password, Role role) {
+		this.name = name;
+		this.email = email;
+		this.password = password;
+		this.role = role;
+	}
+	
 	public Account(int userId, String name, String email, String password, Role role) {
 		this.userId = userId;
 		this.name = name;

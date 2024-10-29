@@ -3,7 +3,8 @@ package supereats;
 public class Main {
 
 	public static void main(String[] args) {
-		DatabaseSetup.CreateTables();
+		DatabaseSetup.dropTables();
+		DatabaseSetup.createTables();
 		
 		// TODO: Create, Read, Update, Operations
 		

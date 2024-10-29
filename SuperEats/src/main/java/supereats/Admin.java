@@ -2,6 +2,10 @@ package supereats;
 
 public class Admin extends Account {
 	
+	public Admin(String name, String email, String password, Role role) {
+		super(name, email, password, role);
+	}
+	
 	public Admin(int userId, String name, String email, String password, Role role) {
 		super(userId, name, email, password, role);
 	}

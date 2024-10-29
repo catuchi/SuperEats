@@ -4,6 +4,12 @@ public class User extends Account{
 	private String dietaryPreferences;
 	private String profilePicture;
 	
+	public User(String name, String email, String password, Role role, String dietaryPreferences, String profilePicture) {
+		super(name, email, password, role);
+		this.setDietaryPreferences(dietaryPreferences);
+		this.setProfilePicture(profilePicture);
+	}
+	
 	public User(int userId, String name, String email, String password, Role role, String dietaryPreferences, String profilePicture) {
 		super(userId, name, email, password, role);
 		this.setDietaryPreferences(dietaryPreferences);
