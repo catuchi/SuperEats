@@ -20,6 +20,11 @@ public class Ingredient {
         this.unit = unit;
     }
 
+    public Ingredient(int ingredientId, String name) {
+    	this.ingredientId = ingredientId;
+        this.name = name;
+    }
+    
     public Ingredient(String name) {
         this.name = name;
     }
