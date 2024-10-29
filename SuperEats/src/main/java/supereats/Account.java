@@ -46,12 +46,17 @@ public abstract class Account {
     public void setEmail(String email) {
         this.email = email;
     }
+    
+    public String getPassword() {
+        return password;
+    }
+
+    // TODO: we will have to remove this for a more secure password system using hashing
+    public void setPassword(String password) {
+        this.password = password;
+    }
 
     public Role getRole() {
         return role;
     }
-}
-
-enum Role {
-	USER, ADMIN;
 }
