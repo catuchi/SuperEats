@@ -9,8 +9,14 @@ public class MealPlanRecipe {
         this.mealPlanId = mealPlanId;
         this.recipeId = recipeId;
     }
+    
+    public MealPlanRecipe(int mealPlanRecipeId, int mealPlanId, int recipeId) {
+    	this.mealPlanRecipeId = mealPlanRecipeId;
+        this.mealPlanId = mealPlanId;
+        this.recipeId = recipeId;
+    }
 
-    // Getters and Setters
+	// Getters and Setters
     public int getMealPlanRecipeId() {
         return mealPlanRecipeId;
     }

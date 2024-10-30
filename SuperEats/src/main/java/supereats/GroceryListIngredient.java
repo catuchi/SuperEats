@@ -14,6 +14,14 @@ public class GroceryListIngredient {
         this.quantity = quantity;
         this.unit = unit;
     }
+    
+    public GroceryListIngredient(int listIngredientId, int groceryListId, int ingredientId, double quantity, String unit) {
+        this.listIngredientId = listIngredientId;
+        this.groceryListId = groceryListId;
+        this.ingredientId = ingredientId;
+        this.quantity = quantity;
+        this.unit = unit;
+    }
 
     // Getters and Setters
     public int getListIngredientId() {

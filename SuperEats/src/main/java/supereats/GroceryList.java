@@ -4,15 +4,19 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 public class GroceryList {
-    private int listId;
+
+	private int listId;
     private int userId;
     private ArrayList<GroceryListIngredient> ingredients = new ArrayList<>();
 
-    public GroceryList(int userId) {
+    // Constructor without listId, useful when creating a new GroceryList in the database
+	public GroceryList(int userId) {
         this.userId = userId;
     }
 
-    public GroceryList(int userId, ArrayList<GroceryListIngredient> ingredients) {
+    // Constructor with listId, used when loading a GroceryList from the database
+    public GroceryList(int listId, int userId, ArrayList<GroceryListIngredient> ingredients) {
+        this.listId = listId;
         this.userId = userId;
         this.ingredients = ingredients;
     }
@@ -32,7 +36,7 @@ public class GroceryList {
                 } else {
                     // Add new GroceryListIngredient with initial quantity and unit
                     GroceryListIngredient newIngredient = new GroceryListIngredient(
-                        listId, 
+                        listId, // Ensure listId is set before calling this
                         recipeIngredient.getIngredient().getIngredientId(), 
                         recipeIngredient.getQuantity(), 
                         recipeIngredient.getUnit()
@@ -60,4 +64,24 @@ public class GroceryList {
     public ArrayList<GroceryListIngredient> getIngredients() {
         return ingredients;
     }
+    
+    public void setIngredients(ArrayList<GroceryListIngredient> ingredients) {
+		this.ingredients = ingredients;
+	}
+
+	public int getUserId() {
+		return userId;
+	}
+
+	public void setUserId(int userId) {
+		this.userId = userId;
+	}
+	
+    public int getListId() {
+		return listId;
+	}
+
+	public void setListId(int listId) {
+		this.listId = listId;
+	}
 }
