@@ -8,7 +8,7 @@ import java.sql.Statement;
 public class DatabaseVerification {
 
     public static void main(String[] args) {
-        try (Connection conn = DriverManager.getConnection("jdbc:hsqldb:file:supereats;shutdown=true", "SA", "");
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/supereats", "root", "beetroot");
              Statement stmt = conn.createStatement()) {
 
             String[] tables = {"USER", "ADMIN", "RATING", "MEALPLAN", "RECIPE", "GROCERYLIST", "INGREDIENT", "RECIPEINGREDIENT", "MEALPLANRECIPE"};

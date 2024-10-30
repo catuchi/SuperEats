@@ -176,17 +176,49 @@ public class RecipeDAOImplementation implements RecipeDAO {
         try (Connection conn = DatabaseUtil.getConnection();
              Statement stmt = conn.createStatement();
              ResultSet rs = stmt.executeQuery(sql)) {
-
+        	
             while (rs.next()) {
+            	System.out.println("Row found, adding to recipes list");
                 recipes.add(mapResultSetToRecipe(rs));
             }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        System.out.println("Recipes fetched from database: " + recipes);	
         return recipes;
     }
+    
+//    @Override
+//    public List<Recipe> getAllRecipes() {
+//        List<Recipe> recipes = new ArrayList<>();
+//        String sql = "SELECT * FROM Recipe";
+//        
+//        try (Connection conn = DatabaseUtil.getConnection();
+//             PreparedStatement stmt = conn.prepareStatement(sql);
+//             ResultSet rs = stmt.executeQuery()) {
+//            
+//            while (rs.next()) {
+//                Recipe recipe = new Recipe(
+//                    rs.getInt("recipeId"),
+//                    rs.getString("title"),
+//                    rs.getString("description"),
+//                    rs.getString("instructions"),
+//                    rs.getString("cuisineType"),
+//                    rs.getInt("prepTime"),
+//                    rs.getInt("calories"),
+//                    rs.getBoolean("approved")
+//                );
+//                recipes.add(recipe);
+//            }
+//            System.out.println("Recipes fetched from database: " + recipes); // Debugging
+//            
+//        } catch (SQLException e) {
+//            e.printStackTrace();
+//        }
+//        return recipes;
+//    }
+
 
     private Recipe mapResultSetToRecipe(ResultSet rs) throws SQLException {
         int recipeId = rs.getInt("recipeId");

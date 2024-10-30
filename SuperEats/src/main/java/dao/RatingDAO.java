@@ -9,4 +9,5 @@ public interface RatingDAO {
 	List<Rating> getRatingsByRecipeId(int recipeId);
 	void updateRating(Rating rating);
 	void deleteRating(int ratingId);
+	double getAverageRatingByRecipeId(int recipeId);
 }

@@ -1,11 +1,11 @@
 package supereats;
 
-import dao.MealPlanDAOImplementation;
-import dao.MealPlanRecipeDAOImplementation;
+import dao.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Map;
 
 public class MealPlan {
     private int mealPlanId;
@@ -127,16 +127,66 @@ public class MealPlan {
         mealPlanRecipeDAO.deleteByMealPlanAndRecipeId(this.mealPlanId, recipe.getRecipeId());
     }
 
+//    public void generateGroceryList() {
+//        HashMap<String, Double> groceryList = new HashMap<>(); // Example grocery list logic
+//
+//        for (MealPlanRecipe mealPlanRecipe : mealPlanRecipes) {
+//            Recipe recipe = null; // TODO: Retrieve Recipe by recipeId from mealPlanRecipe
+//            for (RecipeIngredient recipeIngredient : recipe.getRecipeIngredients()) {
+//                groceryList.merge(recipeIngredient.getIngredient().getName(), recipeIngredient.getQuantity(), Double::sum);
+//            }
+//        }
+//
+//        // Save or print the generated grocery list
+//    }
+
     public void generateGroceryList() {
-        HashMap<String, Double> groceryList = new HashMap<>(); // Example grocery list logic
+        HashMap<String, Double> groceryList = new HashMap<>(); // Stores ingredient names and cumulative quantities
+
+        // DAO instance to retrieve Recipe data
+        RecipeDAO recipeDAO = new RecipeDAOImplementation(); 
 
         for (MealPlanRecipe mealPlanRecipe : mealPlanRecipes) {
-            Recipe recipe = null; // TODO: Retrieve Recipe by recipeId from mealPlanRecipe
+            // Retrieve the Recipe by recipeId from the MealPlanRecipe
+            Recipe recipe = recipeDAO.getRecipeById(mealPlanRecipe.getRecipeId());
+            
+            // For each ingredient in the recipe, accumulate its quantity in the grocery list
             for (RecipeIngredient recipeIngredient : recipe.getRecipeIngredients()) {
-                groceryList.merge(recipeIngredient.getIngredient().getName(), recipeIngredient.getQuantity(), Double::sum);
+                String ingredientName = recipeIngredient.getIngredient().getName();
+                double quantity = recipeIngredient.getQuantity();
+                
+                // Accumulate quantity in the grocery list using `merge`
+                groceryList.merge(ingredientName, quantity, Double::sum);
             }
         }
 
-        // Save or print the generated grocery list
+        // Optional: Save the generated grocery list to a GroceryList object or print it
+        GroceryList generatedGroceryList = new GroceryList(this.userId); // Create GroceryList for this MealPlan's user
+        ArrayList<GroceryListIngredient> groceryListIngredients = new ArrayList<>();
+
+        for (Map.Entry<String, Double> entry : groceryList.entrySet()) {
+            String ingredientName = entry.getKey();
+            double totalQuantity = entry.getValue();
+            
+            // Retrieve Ingredient ID from DAO if needed or create a new one
+            Ingredient ingredient = new Ingredient(ingredientName);
+            GroceryListIngredient groceryListIngredient = new GroceryListIngredient(
+                generatedGroceryList.getListId(), ingredient.getIngredientId(), totalQuantity, "unit"
+            );
+            groceryListIngredients.add(groceryListIngredient);
+        }
+
+        generatedGroceryList.setIngredients(groceryListIngredients);
+
+        // Optionally save the grocery list to the database using GroceryListDAO
+        GroceryListDAO groceryListDAO = new GroceryListDAOImplementation();
+        groceryListDAO.createGroceryList(generatedGroceryList);
+
+        // Print the generated grocery list
+        System.out.println("Generated Grocery List:");
+        for (GroceryListIngredient item : groceryListIngredients) {
+            System.out.println(item.getDetails());
+        }
     }
+
 }

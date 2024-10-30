@@ -1,9 +1,20 @@
 package supereats;
 
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.sql.Statement;
 
 public class DatabaseSetup {
+	
+	public static void executeSQL(String sql) {
+	    try (Connection conn = DatabaseUtil.getConnection();
+	         Statement stmt = conn.createStatement()) {
+	        stmt.executeUpdate(sql);
+	        System.out.println("SQL executed successfully.");
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
 
     public static void dropTables() {
         String[] dropStatements = {

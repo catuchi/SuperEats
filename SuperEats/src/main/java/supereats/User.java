@@ -1,62 +1,82 @@
 package supereats;
 
-public class User extends Account{
+import dao.UserDAO;
+import dao.UserDAOImplementation;
+
+public class User extends Account {
 	private String dietaryPreferences;
 	private String profilePicture;
-	
-	public User(String name, String email, String password, Role role, String dietaryPreferences, String profilePicture) {
+	private final UserDAO userDAO = new UserDAOImplementation(); // DAO instance for database operations
+
+	public User(String name, String email, String password, Role role, String dietaryPreferences,
+			String profilePicture) {
 		super(name, email, password, role);
-		this.setDietaryPreferences(dietaryPreferences);
-		this.setProfilePicture(profilePicture);
+		this.dietaryPreferences = dietaryPreferences;
+		this.profilePicture = profilePicture;
 	}
-	
-	public User(int userId, String name, String email, String password, Role role, String dietaryPreferences, String profilePicture) {
+
+	public User(int userId, String name, String email, String password, Role role, String dietaryPreferences,
+			String profilePicture) {
 		super(userId, name, email, password, role);
-		this.setDietaryPreferences(dietaryPreferences);
-		this.setProfilePicture(profilePicture);
+		this.dietaryPreferences = dietaryPreferences;
+		this.profilePicture = profilePicture;
+	}
+
+	public User(String name, String email, String password, String dietaryPreferences, String profilePicture) {
+		super(name, email, password, Role.USER);
+		this.dietaryPreferences = dietaryPreferences;
+		this.profilePicture = profilePicture;
 	}
 
 	@Override
 	public void register() {
-		// TODO validate user details (check if email already exists)
-		// TODO hash password
-		// TODO save user details to database
-		System.out.println("User registered successfully: " + getEmail());
+		// Delegate the responsibility of saving the user to the UserDAO
+		if (userDAO.getUserByEmail(getEmail()) == null) { // Check if the email is unique
+			userDAO.createUser(this);
+			System.out.println("User registered successfully: " + getEmail());
+		} else {
+			System.out.println("Registration failed: Email already in use.");
+		}
 	}
 
 	@Override
 	public void login() {
-		// TODO check email and hashed password with ones stored in the database
-		// TODO log user in (might also have to initialize a session or token)
-		System.out.println("User logged in: " + getEmail());
+		// Fetch user by email and validate password
+		User userFromDB = userDAO.getUserByEmail(getEmail());
+		if (userFromDB != null && userFromDB.getPassword().equals(getPassword())) { // Password hashing should be here
+			System.out.println("User logged in: " + getEmail());
+		} else {
+			System.out.println("Login failed: Invalid credentials.");
+		}
 	}
 
 	@Override
 	public void logout() {
-		// TODO delete session or token (if one was created)
+		// Retain as-is since logout is typically a session-related operation
 		System.out.println("User logged out: " + getEmail());
 	}
-	
+
 	public void updateProfile(String newName, String newEmail, String newDietaryPreferences, String newProfilePicture) {
 		if (newName != null && !newName.isEmpty()) {
-	        setName(newName);
-	    }
-	    
-	    if (newEmail != null && !newEmail.isEmpty()) {
-	        // TODO: Check if the new email is unique if stored in a database
-	        setEmail(newEmail);
-	    }
-	    
-	    if (newDietaryPreferences != null && !newDietaryPreferences.isEmpty()) {
-	        setDietaryPreferences(newDietaryPreferences);
-	    }
-	    
-	    if (newProfilePicture != null && !newProfilePicture.isEmpty()) {
-	        setProfilePicture(newProfilePicture);
-	    }
-	    
-	    // TODO: Save updated profile to the database
-	    System.out.println("Profile updated for user: " + getEmail());
+			setName(newName);
+		}
+
+		if (newEmail != null && !newEmail.isEmpty() && userDAO.getUserByEmail(newEmail) == null) { // Ensure unique
+																									// email
+			setEmail(newEmail);
+		}
+
+		if (newDietaryPreferences != null && !newDietaryPreferences.isEmpty()) {
+			setDietaryPreferences(newDietaryPreferences);
+		}
+
+		if (newProfilePicture != null && !newProfilePicture.isEmpty()) {
+			setProfilePicture(newProfilePicture);
+		}
+
+		// Delegate saving the updated profile to the UserDAO
+		userDAO.updateUser(this);
+		System.out.println("Profile updated for user: " + getEmail());
 	}
 
 	public String getDietaryPreferences() {
@@ -73,5 +93,9 @@ public class User extends Account{
 
 	public void setProfilePicture(String profilePicture) {
 		this.profilePicture = profilePicture;
+	}
+
+	public void setRole(Role role) {
+		super.setRole(role);
 	}
 }

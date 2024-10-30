@@ -8,4 +8,5 @@ public interface RecipeIngredientDAO {
     List<RecipeIngredient> getIngredientsByRecipeId(int recipeId);
     void updateRecipeIngredient(RecipeIngredient recipeIngredient);
     void deleteRecipeIngredient(int recipeIngredientId);
+    void removeRecipeIngredient(RecipeIngredient recipeIngredient);
 }

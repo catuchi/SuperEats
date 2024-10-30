@@ -79,6 +79,22 @@ public class RecipeIngredientDAOImplementation implements RecipeIngredientDAO {
             e.printStackTrace();
         }
     }
+    
+    @Override
+    public void removeRecipeIngredient(RecipeIngredient recipeIngredient) {
+        String sql = "DELETE FROM RecipeIngredient WHERE recipeIngredientId = ?";
+
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, recipeIngredient.getRecipeIngredientId());
+            stmt.executeUpdate();
+
+            System.out.println("RecipeIngredient removed successfully.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
 
     // Helper method to map ResultSet to RecipeIngredient object
     private RecipeIngredient mapResultSetToRecipeIngredient(ResultSet rs) throws SQLException {

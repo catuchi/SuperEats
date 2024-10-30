@@ -99,6 +99,27 @@ public class RatingDAOImplementation implements RatingDAO {
             e.printStackTrace();
         }
     }
+    
+    @Override
+    public double getAverageRatingByRecipeId(int recipeId) {
+        String sql = "SELECT AVG(rating) AS averageRating FROM Rating WHERE recipeId = ?";
+        double averageRating = 0.0;
+
+        try (Connection conn = DatabaseUtil.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+            
+            stmt.setInt(1, recipeId);
+            ResultSet rs = stmt.executeQuery();
+            
+            if (rs.next()) {
+                averageRating = rs.getDouble("averageRating");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+        return averageRating;
+    }
 
     // Helper method to map ResultSet to Rating object
     private Rating mapResultSetToRating(ResultSet rs) throws SQLException {

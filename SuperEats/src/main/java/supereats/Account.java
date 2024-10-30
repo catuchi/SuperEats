@@ -55,6 +55,10 @@ public abstract class Account {
     public void setPassword(String password) {
         this.password = password;
     }
+    
+    protected void setRole(Role role) {
+        this.role = role;
+    }
 
     public Role getRole() {
         return role;
