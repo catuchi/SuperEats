@@ -12,4 +12,7 @@ public interface RecipeDAO {
 	void updateRecipe(Recipe recipe);
 	void deleteRecipe(int recipeId);
 	List<Recipe> getAllRecipes();
+	List<Recipe> findRecipesByIngredient(String ingredient);
+    List<Recipe> findRecipesByCuisine(String cuisine);
+    List<Recipe> findRecipesByTitle(String title);
 }
