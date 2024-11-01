@@ -49,7 +49,9 @@ public class RecipeServlet extends HttpServlet {
 	        case "view":
 	            viewRecipe(request, response);
 	            break;
-	        case "searchForm":  // Show the search form
+	        case "searchForm":
+	            List<Recipe> allRecipes = recipeService.getAllRecipes(); // Fetch all recipes
+	            request.setAttribute("allRecipes", allRecipes);
 	            request.getRequestDispatcher("/WEB-INF/views/recipeSearch.jsp").forward(request, response);
 	            break;
 	        case "search":
@@ -83,25 +85,43 @@ public class RecipeServlet extends HttpServlet {
 	    request.getRequestDispatcher("/WEB-INF/views/recipeSearchResults.jsp").forward(request, response);
 	}
 
-	private void viewRecipe(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		String recipeIdParam = request.getParameter("recipeId") != null ? request.getParameter("recipeId")
-				: request.getParameter("id");
-
-		if (recipeIdParam != null) {
-			int recipeId = Integer.parseInt(recipeIdParam);
-			Recipe recipe = recipeService.getRecipeById(recipeId); // Fetch the recipe
-
-			if (recipe != null) {
-				request.setAttribute("recipe", recipe);
-				request.getRequestDispatcher("/WEB-INF/views/recipeDetails.jsp").forward(request, response);
-				return;
-			}
-		}
-
-		// Redirect to home or show an error message if the recipe is not found
-		response.sendRedirect(request.getContextPath() + "/home");
+//	private void viewRecipe(HttpServletRequest request, HttpServletResponse response)
+//			throws ServletException, IOException {
+//		String recipeIdParam = request.getParameter("recipeId") != null ? request.getParameter("recipeId")
+//				: request.getParameter("id");
+//
+//		if (recipeIdParam != null) {
+//			int recipeId = Integer.parseInt(recipeIdParam);
+//			Recipe recipe = recipeService.getRecipeById(recipeId); // Fetch the recipe
+//
+//			if (recipe != null) {
+//				request.setAttribute("recipe", recipe);
+//				request.getRequestDispatcher("/WEB-INF/views/recipeDetails.jsp").forward(request, response);
+//				return;
+//			}
+//		}
+//
+//		// Redirect to home or show an error message if the recipe is not found
+//		response.sendRedirect(request.getContextPath() + "/home");
+//	}
+	
+	private void viewRecipe(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	    int recipeId = Integer.parseInt(request.getParameter("id"));
+	    Recipe recipe = recipeService.getRecipeById(recipeId);
+	    
+	    if (recipe != null) {
+	        request.setAttribute("recipe", recipe);
+	        
+	        // Fetch additional data
+	        request.setAttribute("recipeIngredients", recipeService.getRecipeIngredients(recipeId));
+	        request.setAttribute("averageRating", recipeService.getAverageRating(recipeId));
+	        
+	        request.getRequestDispatcher("/WEB-INF/views/recipeDetails.jsp").forward(request, response);
+	    } else {
+	        response.sendRedirect(request.getContextPath() + "/home");
+	    }
 	}
+
 
 //	private void searchRecipes(HttpServletRequest request, HttpServletResponse response)
 //			throws ServletException, IOException {
@@ -129,6 +149,22 @@ public class RecipeServlet extends HttpServlet {
 		request.setAttribute("recipes", recipes);
 		request.getRequestDispatcher("/WEB-INF/views/recipeList.jsp").forward(request, response);
 	}
+	
+	protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+	    String action = request.getParameter("action");
+
+	    if ("rate".equals(action)) {
+	        int recipeId = Integer.parseInt(request.getParameter("recipeId"));
+	        int ratingValue = Integer.parseInt(request.getParameter("rating"));
+	        int userId = (int) request.getSession().getAttribute("userId"); // Assuming userId is stored in session
+	        
+	        recipeService.rateRecipe(recipeId, userId, ratingValue);
+
+	        // Redirect back to the recipe details page to see the updated rating
+	        response.sendRedirect(request.getContextPath() + "/recipe?action=view&id=" + recipeId);
+	    }
+	}
+
 
 	@Override
 	public void destroy() {

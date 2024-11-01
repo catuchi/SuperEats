@@ -5,8 +5,10 @@ import dao.RecipeDAOImplementation;
 import dao.RatingDAO;
 import dao.RatingDAOImplementation;
 import supereats.Recipe;
+import supereats.RecipeIngredient;
 import supereats.Rating;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -58,6 +60,15 @@ public class RecipeService {
         System.out.println("Recipes from DAO: " + recipes); // Debugging
         return recipes;
     }
+    
+    public double getAverageRating(int recipeId) {
+        return ratingDAO.getAverageRatingByRecipeId(recipeId);
+    }
+
+    public List<RecipeIngredient> getRecipeIngredients(int recipeId) {
+        Recipe recipe = recipeDAO.getRecipeById(recipeId);
+        return recipe != null ? recipe.getRecipeIngredients() : new ArrayList<>();
+    }
 
 
     public void rateRecipe(int recipeId, int userId, int ratingValue) {
@@ -69,6 +80,11 @@ public class RecipeService {
         } else {
             System.out.println("Recipe not found with ID: " + recipeId);
         }
+    }
+    
+    public void addRating(int recipeId, int userId, int ratingValue) {
+        Rating rating = new Rating(userId, recipeId, ratingValue);
+        ratingDAO.addRating(rating);
     }
     
     public List<Recipe> getFeaturedRecipes() {

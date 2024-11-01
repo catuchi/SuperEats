@@ -1,4 +1,9 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<head>
+    <meta charset="UTF-8">
+    <title>SuperEats</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/resources/css/styles.css">
+</head>
 <div class="header">
     <nav>
         <ul>
