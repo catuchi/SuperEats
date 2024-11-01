@@ -3,6 +3,7 @@ package dao;
 import java.util.List;
 
 import supereats.Admin;
+import supereats.User;
 
 public interface AdminDAO {
 	void createAdmin(Admin admin);
@@ -11,4 +12,5 @@ public interface AdminDAO {
 	void updateAdmin(Admin admin);
 	void deleteAdmin(int adminId);
 	List<Admin> getAllAdmins();
+	User getAdminByEmailReturnUser(String email);
 }

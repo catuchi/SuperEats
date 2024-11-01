@@ -7,6 +7,7 @@ import java.util.List;
 import supereats.Admin;
 import supereats.DatabaseUtil;
 import supereats.Role;
+import supereats.User;
 
 public class AdminDAOImplementation implements AdminDAO {
 
@@ -159,6 +160,35 @@ public class AdminDAOImplementation implements AdminDAO {
 
         return admins;
     }
+	
+	public User getAdminByEmailReturnUser(String email) {
+	    String sql = "SELECT * FROM Admin WHERE email = ?";
+	    User admin = null;
+
+	    try (Connection conn = DatabaseUtil.getConnection();
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+	        stmt.setString(1, email);
+	        ResultSet rs = stmt.executeQuery();
+
+	        if (rs.next()) {
+	            // Assuming User object is used for both regular users and admins
+	            admin = new User(
+	                rs.getInt("userId"),
+	                rs.getString("name"),
+	                rs.getString("email"),
+	                rs.getString("password"),
+	                Role.ADMIN, // Set role to ADMIN here
+	                null, // Dietary preferences are typically not used for Admins
+	                null  // Profile picture is typically not used for Admins
+	            );
+	        }
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+
+	    return admin;
+	}
+
 	
 	private Admin mapResultSetToAdmin(ResultSet rs) throws SQLException {
 		int adminId = rs.getInt("userId");
