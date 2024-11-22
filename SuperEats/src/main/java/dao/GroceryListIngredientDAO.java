@@ -14,4 +14,5 @@ public interface GroceryListIngredientDAO {
     void addIngredient(GroceryListIngredient groceryListIngredient);
     GroceryListIngredient getIngredientByListIdAndIngredientId(int groceryListId, int ingredientId);
     void updateIngredient(GroceryListIngredient groceryListIngredient);
+	void deleteIngredientByListIdAndIngredientId(int groceryListId, int ingredientId);
 }

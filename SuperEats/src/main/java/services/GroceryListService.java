@@ -15,103 +15,105 @@ import java.util.List;
 
 public class GroceryListService {
 
-    private GroceryListDAO groceryListDAO;
-    private GroceryListIngredientDAO groceryListIngredientDAO;
+	private GroceryListDAO groceryListDAO;
+	private GroceryListIngredientDAO groceryListIngredientDAO;
 
-    public GroceryListService(GroceryListDAO groceryListDAO, GroceryListIngredientDAO groceryListIngredientDAO) {
-        this.groceryListDAO = groceryListDAO;
-        this.groceryListIngredientDAO = groceryListIngredientDAO;
-    }
-
-    public GroceryListService() {
-    	this.groceryListDAO = new GroceryListDAOImplementation();
-        this.groceryListIngredientDAO = new GroceryListIngredientDAOImplementation();
+	public GroceryListService(GroceryListDAO groceryListDAO, GroceryListIngredientDAO groceryListIngredientDAO) {
+		this.groceryListDAO = groceryListDAO;
+		this.groceryListIngredientDAO = groceryListIngredientDAO;
 	}
-    
-    public List<GroceryList> getAllGroceryLists() {
-        return groceryListDAO.getAllGroceryLists();
-    }
 
-	// Method to create a new grocery list
-    public void createGroceryList(GroceryList groceryList) {
-        groceryListDAO.createGroceryList(groceryList);
-    }
+	public GroceryListService() {
+		this.groceryListDAO = new GroceryListDAOImplementation();
+		this.groceryListIngredientDAO = new GroceryListIngredientDAOImplementation();
+	}
 
-    // Method to retrieve a grocery list by its ID
-    public GroceryList getGroceryListById(int listId) {
-        return groceryListDAO.getGroceryListById(listId);
-    }
+	public List<GroceryList> getAllGroceryLists() {
+		return groceryListDAO.getAllGroceryLists();
+	}
 
-    // Method to retrieve all grocery lists by user ID
-    public List<GroceryList> getGroceryListsByUserId(int userId) {
-        return groceryListDAO.getGroceryListsByUserId(userId);
-    }
+	public void createGroceryList(GroceryList groceryList) {
+		groceryListDAO.createGroceryList(groceryList);
+	}
 
-    // Method to update an existing grocery list
-    public void updateGroceryList(GroceryList groceryList) {
-        groceryListDAO.updateGroceryList(groceryList);
-    }
+	public GroceryList getGroceryListById(int listId) {
+		return groceryListDAO.getGroceryListById(listId);
+	}
 
-    // Method to delete a grocery list by its ID
-    public void deleteGroceryList(int listId) {
-        groceryListDAO.deleteGroceryList(listId);
-    }
+	public List<GroceryList> getGroceryListsByUserId(int userId) {
+		return groceryListDAO.getGroceryListsByUserId(userId);
+	}
 
-    // Method to generate a grocery list based on recipes
-    public GroceryList generateGroceryListFromRecipes(int userId, List<Recipe> recipes) {
-        GroceryList groceryList = new GroceryList(userId);
-        HashMap<Integer, GroceryListIngredient> ingredientMap = new HashMap<>();
+	public void updateGroceryList(GroceryList groceryList) {
+		groceryListDAO.updateGroceryList(groceryList);
+	}
 
-        for (Recipe recipe : recipes) {
-            for (RecipeIngredient recipeIngredient : recipe.getRecipeIngredients()) {
-                int ingredientId = recipeIngredient.getIngredient().getIngredientId();
-                double quantity = recipeIngredient.getQuantity();
-                String unit = recipeIngredient.getUnit();
+	public void deleteGroceryList(int listId) {
+		groceryListDAO.deleteGroceryList(listId);
+	}
 
-                // Update existing ingredient quantity or add new ingredient
-                if (ingredientMap.containsKey(ingredientId)) {
-                    GroceryListIngredient existingIngredient = ingredientMap.get(ingredientId);
-                    existingIngredient.setQuantity(existingIngredient.getQuantity() + quantity);
-                } else {
-                    GroceryListIngredient newIngredient = new GroceryListIngredient(groceryList.getListId(), ingredientId, quantity, unit);
-                    ingredientMap.put(ingredientId, newIngredient);
-                }
-            }
-        }
+	public GroceryList generateGroceryListFromRecipes(int userId, List<Recipe> recipes) {
+		GroceryList groceryList = new GroceryList(userId);
+		HashMap<Integer, GroceryListIngredient> ingredientMap = new HashMap<>();
 
-        // Set the ingredients and save to the database
-        groceryList.setIngredients(new ArrayList<>(ingredientMap.values()));
-        groceryListDAO.createGroceryList(groceryList);
-        return groceryList;
-    }
-    
-    
- // Add this method in GroceryListService
+		for (Recipe recipe : recipes) {
+			for (RecipeIngredient recipeIngredient : recipe.getRecipeIngredients()) {
+				int ingredientId = recipeIngredient.getIngredient().getIngredientId();
+				double quantity = recipeIngredient.getQuantity();
+				String unit = recipeIngredient.getUnit();
 
- // Method to add an ingredient to an existing grocery list
- public void addIngredient(int listId, int ingredientId, double quantity, String unit) {
-     // Retrieve the grocery list to ensure it exists
-     GroceryList groceryList = groceryListDAO.getGroceryListById(listId);
-     if (groceryList == null) {
-         System.out.println("Grocery list with ID " + listId + " does not exist.");
-         return;
-     }
+				// Update existing ingredient quantity or add new ingredient
+				ingredientMap.compute(ingredientId, (key, existing) -> {
+					if (existing == null) {
+						return new GroceryListIngredient(groceryList.getListId(), ingredientId, quantity, unit);
+					}
+					existing.setQuantity(existing.getQuantity() + quantity);
+					return existing;
+				});
+			}
+		}
 
-     // Check if the ingredient already exists in the grocery list
-     GroceryListIngredient existingIngredient = groceryListIngredientDAO.getIngredientByListIdAndIngredientId(listId, ingredientId);
+		groceryList.setIngredients(new ArrayList<>(ingredientMap.values()));
+		groceryListDAO.createGroceryList(groceryList);
+		return groceryList;
+	}
 
-     if (existingIngredient != null) {
-         // If the ingredient exists, update the quantity
-         double updatedQuantity = existingIngredient.getQuantity() + quantity;
-         existingIngredient.setQuantity(updatedQuantity);
-         groceryListIngredientDAO.updateIngredient(existingIngredient);
-     } else {
-         // If the ingredient does not exist, create a new GroceryListIngredient
-         GroceryListIngredient newIngredient = new GroceryListIngredient(listId, ingredientId, quantity, unit);
-         groceryListIngredientDAO.addIngredient(newIngredient);
-     }
+	public void addIngredient(int listId, int ingredientId, double quantity, String unit) {
+		GroceryList groceryList = groceryListDAO.getGroceryListById(listId);
+		if (groceryList == null) {
+			System.out.println("Grocery list with ID " + listId + " does not exist.");
+			return;
+		}
 
-     System.out.println("Ingredient added or updated in grocery list with ID " + listId);
- }
+		GroceryListIngredient existingIngredient = groceryListIngredientDAO.getIngredientByListIdAndIngredientId(listId,
+				ingredientId);
 
+		if (existingIngredient != null) {
+			existingIngredient.setQuantity(existingIngredient.getQuantity() + quantity);
+			groceryListIngredientDAO.updateIngredient(existingIngredient);
+		} else {
+			GroceryListIngredient newIngredient = new GroceryListIngredient(listId, ingredientId, quantity, unit);
+			groceryListIngredientDAO.addIngredient(newIngredient);
+		}
+
+		System.out.println("Ingredient added or updated in grocery list with ID " + listId);
+	}
+
+	public void updateIngredient(int listId, int ingredientId, double quantity, String unit) {
+		GroceryListIngredient ingredient = groceryListIngredientDAO.getIngredientByListIdAndIngredientId(listId,
+				ingredientId);
+		if (ingredient != null) {
+			ingredient.setQuantity(quantity);
+			ingredient.setUnit(unit);
+			groceryListIngredientDAO.updateIngredient(ingredient);
+			System.out.println("Ingredient updated successfully.");
+		} else {
+			System.out.println("Ingredient not found in grocery list with ID " + listId);
+		}
+	}
+
+	public void deleteIngredient(int listId, int ingredientId) {
+		groceryListIngredientDAO.deleteIngredientByListIdAndIngredientId(listId, ingredientId);
+		System.out.println("Ingredient with ID " + ingredientId + " deleted from grocery list ID " + listId);
+	}
 }

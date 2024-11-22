@@ -20,34 +20,85 @@ import java.util.Map;
 
 @WebServlet("/mealPlan")
 public class MealPlanServlet extends HttpServlet {
+	private static final long serialVersionUID = 1L;
 	private MealPlanService mealPlanService = new MealPlanService();
     private final RecipeService recipeService = new RecipeService();
 
-	@Override
-	protected void doGet(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		String action = request.getParameter("action");
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String action = request.getParameter("action");
 
-		if ("view".equals(action)) {
-			handleViewMealPlans(request, response);
-		} else if ("create".equals(action)) {
-			request.getRequestDispatcher("/WEB-INF/views/createMealPlan.jsp").forward(request, response);
-		} else if ("details".equals(action)) {
-			handleMealPlanDetails(request, response);
-		} else {
-			response.sendRedirect(request.getContextPath() + "/home");
-		}
-	}
+        switch (action != null ? action : "view") {
+            case "view":
+                handleViewMealPlans(request, response);
+                break;
+            case "create":
+                request.getRequestDispatcher("/WEB-INF/views/createMealPlan.jsp").forward(request, response);
+                break;
+            case "details":
+                handleMealPlanDetails(request, response);
+                break;
+            case "edit":
+                handleEditMealPlan(request, response);
+                break;
+            case "delete":
+                handleDeleteMealPlan(request, response);
+                break;
+            default:
+                response.sendRedirect(request.getContextPath() + "/home");
+                break;
+        }
+    }
 
-	@Override
-	protected void doPost(HttpServletRequest request, HttpServletResponse response)
-			throws ServletException, IOException {
-		String action = request.getParameter("action");
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        String action = request.getParameter("action");
 
-		if ("create".equals(action)) {
-			handleCreateMealPlan(request, response);
-		}
-	}
+        switch (action != null ? action : "") {
+            case "create":
+                handleCreateMealPlan(request, response);
+                break;
+            case "update":
+                handleUpdateMealPlan(request, response);
+                break;
+            default:
+                response.sendRedirect(request.getContextPath() + "/home");
+                break;
+        }
+    }
+    
+    private void handleEditMealPlan(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        int mealPlanId = Integer.parseInt(request.getParameter("id"));
+        MealPlan mealPlan = mealPlanService.getMealPlanById(mealPlanId);
+
+        if (mealPlan != null) {
+            request.setAttribute("mealPlan", mealPlan);
+            request.getRequestDispatcher("/WEB-INF/views/editMealPlan.jsp").forward(request, response);
+        } else {
+            response.sendRedirect(request.getContextPath() + "/mealPlan?action=view");
+        }
+    }
+    
+    private void handleDeleteMealPlan(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        int mealPlanId = Integer.parseInt(request.getParameter("id"));
+        mealPlanService.deleteMealPlan(mealPlanId);
+        response.sendRedirect(request.getContextPath() + "/mealPlan?action=view");
+    }
+    
+    private void handleUpdateMealPlan(HttpServletRequest request, HttpServletResponse response) throws IOException {
+        int mealPlanId = Integer.parseInt(request.getParameter("mealPlanId"));
+        String name = request.getParameter("name");
+        LocalDate startDate = LocalDate.parse(request.getParameter("startDate"));
+        LocalDate endDate = LocalDate.parse(request.getParameter("endDate"));
+
+        MealPlan mealPlan = new MealPlan(mealPlanId, 0, name, startDate, endDate); 
+        mealPlanService.updateMealPlan(mealPlan);
+
+        response.sendRedirect(request.getContextPath() + "/mealPlan?action=view");
+    }
 
 	private void handleViewMealPlans(HttpServletRequest request, HttpServletResponse response)
 			throws ServletException, IOException {

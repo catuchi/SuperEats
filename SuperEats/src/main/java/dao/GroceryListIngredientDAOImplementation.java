@@ -165,6 +165,29 @@ public class GroceryListIngredientDAOImplementation implements GroceryListIngred
 			e.printStackTrace();
 		}
 	}
+	
+	@Override
+	public void deleteIngredientByListIdAndIngredientId(int groceryListId, int ingredientId) {
+	    String sql = "DELETE FROM GroceryListIngredient WHERE groceryListId = ? AND ingredientId = ?";
+
+	    try (Connection conn = DatabaseUtil.getConnection(); 
+	         PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+	        stmt.setInt(1, groceryListId);
+	        stmt.setInt(2, ingredientId);
+
+	        int rowsAffected = stmt.executeUpdate();
+	        if (rowsAffected > 0) {
+	            System.out.println("Ingredient with ID " + ingredientId + " removed from Grocery List ID " + groceryListId);
+	        } else {
+	            System.out.println("No matching ingredient found to delete.");
+	        }
+
+	    } catch (SQLException e) {
+	        e.printStackTrace();
+	    }
+	}
+
 
 	// Method to update an ingredient in a grocery list
 	@Override
